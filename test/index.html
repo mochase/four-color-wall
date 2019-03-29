@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <canvas width="800" height="400" id="canvas" style="background: beige"></canvas>
+</body>
+<script>
+    (function () {
+        let canvas = document.querySelector('#canvas')
+        let ctx = canvas.getContext('2d')
+        if (!ctx) {
+            return
+        }
+        let devicePixelRatio = window.devicePixelRatio || 1
+        const width = canvas.clientWidth 
+        const height = canvas.clientHeight
+        canvas.width = width * devicePixelRatio
+        canvas.height = height * devicePixelRatio
+        ctx.scale(devicePixelRatio, devicePixelRatio)
+
+        let points = []
+        let colors = ['red', 'orange', 'green', 'blue']
+
+        const seed = [width / 2, height / 2]
+        points.push(seed)
+
+        let i = -1
+        let index = 0
+        let t = 1
+        while (++i < 20) {
+            const point = makePoint(index)
+            points.push(point)
+            index = (index + 1) % t
+            if (index === 0) {
+                t++
+            }
+        }        
+
+        function makePoint (index) {
+            const dis = 50
+            const x = points[index][0] + Math.random() * dis * 2 - dis
+            const y = points[index][1] + Math.random() * dis * 2 - dis
+            if () {
+                return makePoint(index)
+            } else {
+                return [x, y]
+            }
+        }
+
+    })()
+</script>
+</html>

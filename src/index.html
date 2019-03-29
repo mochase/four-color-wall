@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+<style>
+    canvas {
+        background: beige;
+        width: 800px;
+        height: 400px;
+    }
+</style>
+<script>
+    (function () {
+        let canvas = document.querySelector('#canvas')
+        let ctx = canvas.getContext('2d')
+        if (!ctx) {
+            return
+        }
+        let devicePixelRatio = window.devicePixelRatio || 1
+        const width = canvas.clientWidth 
+        const height = canvas.clientHeight
+        canvas.width = width * devicePixelRatio
+        canvas.height = height * devicePixelRatio
+        ctx.scale(devicePixelRatio, devicePixelRatio)
+
+        let numbers = {
+            x: 0,
+            y: 0
+        }
+
+        // 边集合
+        let lines = []
+        // 点集合
+        let points = makeEvenPoints(40)
+
+        let i = -1
+        while (++i < points.length) {
+            ctx.beginPath()
+            ctx.strokeStyle = "orange"
+            ctx.arc(points[i].x, points[i].y, 6, 0, 2 * Math.PI)
+            ctx.stroke()
+            ctx.fillText(i, points[i].x, points[i].y)
+            ctx.beginPath()
+
+        }
+        
+        for (let j = 0; j < points.length; j++) {
+            for (let k = j + 1; k < points.length; k++) {
+                makeLine(points[j], points[k])
+            }
+        }
+
+        
+        ctx.beginPath()
+        lines.forEach(function (v) {
+            ctx.moveTo(v[0].x, v[0].y)
+            ctx.lineTo(v[1].x, v[1].y)
+            ctx.stroke()
+        })
+        
+
+        // 生成边
+        function makeLine(a, b) {
+            let dis = Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2))
+            let maxdis = Math.sqrt(Math.pow((width/numbers.x * 2), 2) + Math.pow((height/numbers.y * 2), 2))
+            if (dis > maxdis) {
+                return
+            }
+            // 是否和已存在的边相交
+            let cross = false
+            for (let i = 0; i < lines.length; i++) {
+                if (checkIsCross(lines[i], [a, b])) {
+                   cross = true
+                   break
+                }
+            }
+            if (!cross) {
+                lines.push([a, b])
+            }
+        }
+        
+        function checkIsCross ([m1, m2], [n1, n2]) {
+            try {
+                // line1
+                let k1 = (m2.y - m1.y) / (m2.x - m1.x)
+                let b1 = (m1.y - k1 * m1.x) 
+                // line2
+                let k2 = (n2.y - n1.y) / (n2.x - n1.x)
+                let b2 = (n1.y - k2 * n1.x)
+                // 求交点
+                let x0 = (b2 - b1) / (k1 - k2)
+                if ((x0 < Math.max(m1.x, m2.x) - 0.1) && (x0 > Math.min(m1.x, m2.x) + 0.1) 
+                    && (x0 < Math.max(n1.x, n2.x) - 0.1) && (x0 > Math.min(n1.x, n2.x) + 0.1)) {
+                    return true
+                }
+                return false
+            } catch (e) {
+                console.error(e)
+                return true
+            }
+        }
+
+        // 生成在小区域内均匀分布的点
+        function makeEvenPoints(num) {
+            let rate = width / height
+            let y = Math.ceil(Math.sqrt(num/rate))
+            numbers = {
+                x: Math.ceil(rate * y),
+                y: y
+            }
+            const arr = []
+            let i = -1
+            while (++i < numbers.x) {
+                let j = -1
+                while (++j < numbers.y) {
+                    let area = {
+                        x: width * i / numbers.x,
+                        y: height * j / numbers.y
+                    }
+
+                    let point = {
+                        x: Math.random() * width / numbers.x + area.x,
+                        y: Math.random() * height / numbers.y + area.y
+                    }
+                    arr.push(point)
+
+                }
+            }
+            return arr
+        }
+    })()
+</script>
+
+</html>
